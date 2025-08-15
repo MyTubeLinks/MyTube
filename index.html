@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTube</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img id="symbol" src="symbol.png" alt="Sym" width="80" height="80"> <!-- Aumentado a 80px para que sea un poco más grande y estético -->
+            MyTube
+        </div>
+        <select id="language-selector">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="pt">Português</option>
+            <option value="de">Deutsch</option>
+        </select>
+    </header>
+
+    <h1 id="title">Descargar Videos de YouTube 4K</h1>
+
+    <input type="text" id="url-input" placeholder="Busca o pega el enlace aquí...">
+    <button id="start-btn">Start →</button>
+
+    <div id="results" style="display: none;">
+        <h2 id="video-title"></h2>
+        <img id="thumbnail" alt="Thumbnail">
+        <div id="format-options"></div>
+    </div>
+
+    <p id="description">Descarga de videos online rápida y sin complicaciones<br>MyTube es una plataforma gratuita que te permite obtener videos y audios de YouTube con la mejor calidad disponible, directamente desde tu navegador. Convierte y guarda tus contenidos favoritos en formatos como MP4, MP3, WEBM, M4A, en resoluciones que van desde 360p hasta 4K, sin instalar programas ni extensiones. Funciona de forma fluida tanto en computadoras como en dispositivos móviles, ofreciendo una experiencia veloz, segura y sencilla para guardar miles de videos en pocos clics.</p>
+
+    <h2 id="how-to">Cómo funciona MyTube</h2>
+    <ol id="steps">
+        <li>Copia el enlace del video de YouTube y pégalo en la barra de búsqueda de MyTube.</li>
+        <li>Presiona el botón "Iniciar" para comenzar la conversión.</li>
+        <li>Elige el formato y la calidad que prefieras (MP3 para audio o MP4 para video).</li>
+        <li>Pulsa "Descargar" y guarda el archivo directamente en tu dispositivo.</li>
+    </ol>
+
+    <footer>
+        <span id="contact-link">Contact</span>
+        <div id="contact-email" style="display: none;">mytubebusines@gmail.com</div>
+    </footer>
+
+    <div id="loading" style="display: none;">Cargando descarga... Por favor espera.</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
