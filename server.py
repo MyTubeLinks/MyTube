@@ -1,3 +1,4 @@
+# server.py
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,7 +8,7 @@ from urllib.parse import quote
 import tempfile
 import os
 import shutil
-from fastapi.staticfiles import StaticFiles  # Nueva importación aquí
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -54,7 +55,7 @@ def download(url: str = Query(...), itag: str = Query(...), output_format: str =
             'continuedl': True,
             'nopart': True,
             'external_downloader': 'aria2c',
-            'external_downloader_args': {'aria2c': ['-c', '-j', '3', '-x', '8', '-s', '8', '-k', '1M']},  # Aria2c para velocidad (8 conexiones)
+            'external_downloader_args': {'aria2c': ['-c', '-j', '5', '-x', '16', '-s', '16', '-k', '1M']},
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -71,7 +72,6 @@ def download(url: str = Query(...), itag: str = Query(...), output_format: str =
             else:
                 ydl_opts['format'] = itag
                 file_ext = next((f['ext'] for f in info['formats'] if f['format_id'] == itag), 'mp4')
-                # Determinamos si es audio o video para asignar media_type correctamente
                 format_selected = next((f for f in info['formats'] if f['format_id'] == itag), None)
                 if format_selected and format_selected.get('vcodec') == 'none':
                     media_type = 'audio/' + file_ext
@@ -89,7 +89,7 @@ def download(url: str = Query(...), itag: str = Query(...), output_format: str =
             if not os.path.exists(actual_path):
                 raise HTTPException(status_code=500, detail="Downloaded file does not exist")
 
-        filename = f"{info['title']}.{file_ext}".replace(" ", "_")  # Corregido: Cerramos el quote aquí
+        filename = f"{info['title']}.{file_ext}".replace(" ", "_")
         filename_encoded = quote(filename.encode('utf-8'))
         headers = {"Content-Disposition": f"attachment; filename*=UTF-8''{filename_encoded}"}
 
@@ -102,6 +102,5 @@ def download(url: str = Query(...), itag: str = Query(...), output_format: str =
         if temp_dir and os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
         raise HTTPException(status_code=400, detail=str(e))
-
 
 app.mount("/", StaticFiles(directory=".", html=True), name="static")

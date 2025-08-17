@@ -1,3 +1,4 @@
+/* style.css */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f0f4ff;
@@ -113,4 +114,12 @@ footer {
 #loading {
     margin-top: 20px;
     font-weight: bold;
+    color: #ff0000; /* Color rojo para destacar */
+    animation: blink 1s infinite; /* Animación de parpadeo */
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
 }

@@ -1,3 +1,4 @@
+// script.js
 const translations = {
     es: {
         title: "Descargar Videos de YouTube 4K",
@@ -42,7 +43,7 @@ const translations = {
         title: "Baixar Vídeos do YouTube 4K",
         placeholder: "Pesquise ou cole o link aqui...",
         start: "Start →",
-        description: "Download de vídeos online rápido e sem complicações\nMyTube é uma plataforma gratuita que permite obter vídeos e áudios do YouTube com a melhor qualidade disponível, diretamente do seu navegador. Converta e salve seus conteúdos favoritos em formatos como MP4, MP3, WEBM, M4A, em resoluções de 360p a 4K, sem instalar programas ou extensões. Funciona de forma fluida em computadores e dispositivos móveis, oferecendo uma experiencia rápida, segura e simples para salvar milhares de vídeos em poucos cliques.",
+        description: "Download de vídeos online rápido e sem complicações\nMyTube é uma plataforma gratuita que permite obter vídeos e áudios do YouTube com a melhor qualidade disponível, diretamente do seu navegador. Converta e salve seus conteúdos favoritos em formatos como MP4, MP3, WEBM, M4A, em resoluções de 360p a 4K, sem instalar programas ou extensões. Funciona de forma fluida em computadores e dispositivos móveis, oferecendo uma experiência rápida, segura e simples para salvar milhares de vídeos em poucos cliques.",
         howTo: "Como funciona o MyTube",
         steps: [
             "Copie o link do vídeo do YouTube e cole na barra de pesquisa do MyTube.",
@@ -86,10 +87,10 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     if (!url) return alert('Ingresa un enlace válido');
 
     const loading = document.getElementById('loading');
-    loading.style.display = 'block';  // Muestra loading al buscar
+    loading.style.display = 'block';
 
     try {
-        const response = await fetch(`http://127.0.0.1:8000/info?url=${encodeURIComponent(url)}`);
+        const response = await fetch(`/info?url=${encodeURIComponent(url)}`);
         if (!response.ok) throw new Error(await response.text());
         const data = await response.json();
 
@@ -111,14 +112,13 @@ document.getElementById('start-btn').addEventListener('click', async () => {
             let outputFormat = null;
             if (f.type === 'audio') {
                 label = `Audio (${f.subtype.toUpperCase()})`;
-                // Comentado para eliminar MP3 (descomenta si instalas FFmpeg)
-                // if (f.subtype !== 'mp3' && !uniqueLabels.has('MP3 (Audio)')) {
-                //     const mp3Btn = document.createElement('button');
-                //     mp3Btn.innerText = 'MP3 (Audio)';
-                //     mp3Btn.addEventListener('click', () => downloadFile(url, f.itag, 'mp3', 'MP3 (Audio)'));
-                //     optionsDiv.appendChild(mp3Btn);
-                //     uniqueLabels.add('MP3 (Audio)');
-                // }
+                if (f.subtype !== 'mp3' && !uniqueLabels.has('MP3 (Audio)')) {
+                    const mp3Btn = document.createElement('button');
+                    mp3Btn.innerText = 'MP3 (Audio)';
+                    mp3Btn.addEventListener('click', () => downloadFile(url, f.itag, 'mp3', 'MP3 (Audio)'));
+                    optionsDiv.appendChild(mp3Btn);
+                    uniqueLabels.add('MP3 (Audio)');
+                }
             } else {
                 label += ` (${f.subtype.toUpperCase()})`;
             }
@@ -136,17 +136,16 @@ document.getElementById('start-btn').addEventListener('click', async () => {
     } catch (e) {
         alert('Error: ' + e.message);
     } finally {
-        loading.style.display = 'none';  // Oculta loading
+        loading.style.display = 'none';
     }
 });
 
-// Función para descargar con loading
 async function downloadFile(url, itag, outputFormat, label) {
     const loading = document.getElementById('loading');
-    loading.style.display = 'block';  // Muestra loading
+    loading.style.display = 'block';
 
     try {
-        const response = await fetch(`http://127.0.0.1:8000/download?url=${encodeURIComponent(url)}&itag=${itag}${outputFormat ? `&output_format=${outputFormat}` : ''}`);
+        const response = await fetch(`/download?url=${encodeURIComponent(url)}&itag=${itag}${outputFormat ? `&output_format=${outputFormat}` : ''}`);
         if (!response.ok) throw new Error(await response.text());
 
         const blob = await response.blob();
@@ -154,7 +153,7 @@ async function downloadFile(url, itag, outputFormat, label) {
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = downloadUrl;
-        a.download = `${label.replace(/ /g, '_')}`;  // Nombre del archivo basado en label
+        a.download = `${label.replace(/ /g, '_')}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(downloadUrl);
@@ -162,7 +161,7 @@ async function downloadFile(url, itag, outputFormat, label) {
     } catch (e) {
         alert('Error en descarga: ' + e.message);
     } finally {
-        loading.style.display = 'none';  // Oculta loading
+        loading.style.display = 'none';
     }
 }
 
