@@ -23,7 +23,11 @@ app.add_middleware(
 @app.get("/info")
 def get_info(url: str = Query(...)):
     try:
-        ydl_opts = {'quiet': True, 'no_warnings': True}
+        ydl_opts = {
+            'quiet': True,
+            'no_warnings': True,
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             formats = []
@@ -54,8 +58,7 @@ def download(url: str = Query(...), itag: str = Query(...), output_format: str =
             'outtmpl': output_template,
             'continuedl': True,
             'nopart': True,
-            'external_downloader': 'aria2c',
-            'external_downloader_args': {'aria2c': ['-c', '-j', '5', '-x', '16', '-s', '16', '-k', '1M']},
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
