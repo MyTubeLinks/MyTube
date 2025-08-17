@@ -26,7 +26,8 @@ def get_info(url: str = Query(...)):
         ydl_opts = {
             'quiet': True,
             'no_warnings': True,
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'cookiefile': 'cookies.txt'  # Opcional, si tenés cookies guardadas
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
@@ -47,7 +48,7 @@ def get_info(url: str = Query(...)):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/download")
-def download(url: str = Query(...), itag: str = Query(...), output_format: str = Query(None)):
+def download(url: str = Query(...), itag: str = Query(...)):
     temp_dir = None
     try:
         temp_dir = tempfile.mkdtemp()
@@ -58,28 +59,17 @@ def download(url: str = Query(...), itag: str = Query(...), output_format: str =
             'outtmpl': output_template,
             'continuedl': True,
             'nopart': True,
-            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'retries': 3,  # Intenta 3 veces si falla
+            'fragment_retries': 3,
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
-            if output_format == 'mp3':
-                ydl_opts['format'] = 'bestaudio'
-                ydl_opts['postprocessors'] = [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'mp3',
-                    'preferredquality': '192',
-                }]
-                file_ext = 'mp3'
-                media_type = 'audio/mpeg'
-            else:
-                ydl_opts['format'] = itag
-                file_ext = next((f['ext'] for f in info['formats'] if f['format_id'] == itag), 'mp4')
-                format_selected = next((f for f in info['formats'] if f['format_id'] == itag), None)
-                if format_selected and format_selected.get('vcodec') == 'none':
-                    media_type = 'audio/' + file_ext
-                else:
-                    media_type = 'video/' + file_ext
+            ydl_opts['format'] = itag
+            file_ext = next((f['ext'] for f in info['formats'] if f['format_id'] == itag), 'mp4')
+            format_selected = next((f for f in info['formats'] if f['format_id'] == itag), None)
+            media_type = 'audio/' + file_ext if format_selected and format_selected.get('vcodec') == 'none' else 'video/' + file_ext
 
             ydl.download([url])
 
